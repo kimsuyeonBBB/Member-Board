@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -28,20 +29,31 @@ public class MemberListServlet extends HttpServlet{
 	@Override 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{		
 		Connection conn = null;
-		Statement stmt = null;
+		//Statement stmt = null;
 		ResultSet rs = null;
 		
+		//삼항 연산자 이용 (조건이 참이면 ? 뒤에 실행, 거짓이면 : 뒤에 실행)
+		String cpagenumgg = request.getParameter("pagenum") != null ? request.getParameter("pagenum")  : "1" ;
+		int cpagenum = Integer.parseInt(cpagenumgg);
+		System.out.println(cpagenum);
+		
+		//회원목록을 담을 ArrayList 객체를 준비한다.
+		ArrayList<Member> members = new ArrayList<Member>();
+		ArrayList<Member> totalCount = new ArrayList<Member>();
+		PageMaker pagemaker = new PageMaker();
+		
+		PreparedStatement stmt = null;
 		try {
 			ServletContext sc = this.getServletContext();
 			
 			//서블릿은 ServletContext 보관소에서 DB 커넥션을 꺼낸다.
 			conn = (Connection) sc.getAttribute("conn");
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery("SELECT MNO,MNAME,EMAIL,CRE_DATE" + " FROM MEM_AD" + " ORDER BY MNO ASC");
+			stmt = conn.prepareStatement("SELECT MNO,MNAME,EMAIL,CRE_DATE FROM MEM_AD ORDER BY MNO ASC LIMIT ?,?");
+			stmt.setInt(1, (cpagenum-1)*5);
+			stmt.setInt(2, pagemaker.getContentnum());
+			rs = stmt.executeQuery();
 			
 			response.setContentType("text/html; charset=UTF-8");
-			//회원목록을 담을 ArrayList 객체를 준비한다.
-			ArrayList<Member> members = new ArrayList<Member>();
 			
 			//데이터베이스에서 회원정보를 가져와 Member에 담는다.
 			//그리고 Member 객체를 ArrayList에 추가한다.
@@ -53,8 +65,38 @@ public class MemberListServlet extends HttpServlet{
 						.setCreatedDate(rs.getDate("CRE_DATE")) );
 			}
 			
+			conn = (Connection) sc.getAttribute("conn");
+			stmt = conn.prepareStatement("SELECT MNO,MNAME,EMAIL,CRE_DATE FROM MEM_AD ORDER BY MNO ASC");
+			rs = stmt.executeQuery();
+						
+			//데이터베이스에서 회원정보를 가져와 Member에 담는다.
+			//그리고 Member 객체를 ArrayList에 추가한다.
+			while(rs.next()) {
+				totalCount.add(new Member()
+						.setNo(rs.getInt("MNO"))
+						.setName(rs.getString("MNAME"))
+						.setEmail(rs.getString("EMAIL")) 
+						.setCreatedDate(rs.getDate("CRE_DATE")) );
+			}
+			
+			/*---------페이지 객체에 새로운 정보 다시 지정해주는 부분------------------*/
+			int totalnum = totalCount.size();
+			System.out.println(totalnum);
+			pagemaker.setTotalcount(totalnum);
+			pagemaker.setPagenum(cpagenum);
+			pagemaker.setCurrentblock(cpagenum);
+			pagemaker.setLastblock(pagemaker.getTotalcount());
+			
+			pagemaker.prevnext(cpagenum);
+			pagemaker.setStartPage(pagemaker.getCurrentblock());
+			pagemaker.setEndPage(pagemaker.getLastblock(),pagemaker.getCurrentblock());
+			
+			System.out.println("cpagenum:" + cpagenum);
+			System.out.println("pagenum:" + pagemaker.getPagenum());
+			
 			//request에 회원 목록 데이터 보관한다.
 			request.setAttribute("members", members);
+			request.setAttribute("page", pagemaker);
 			
 			//JSP로 출력을 위임한다.
 			//다른 서블릿이나 JSP로 작업을 위임할 때 사용하는 객체가 RequestDispatcher이다.

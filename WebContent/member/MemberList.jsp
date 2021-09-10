@@ -2,11 +2,22 @@
 <%@ page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>회원 목록</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+    function page(idx){
+        var pagenum = idx;            
+        location.href="${pageContext.request.contextPath}/member/list?pagenum="+pagenum;
+    }
+</script>
+
 </head>
 <body>
 
@@ -47,6 +58,31 @@ function removeCheck(){
 }
 </script>
 <%}%>
+
+<table>
+    <tfoot>
+         <tr>
+             <td colspan="2">
+                 <!-- 왼쪽 화살표 -->
+                 <c:if test="${page.isPrev()}">
+                     <a style="text-decoration:none;" href="javascript:page(${page.getStartPage()});">&laquo;</a>
+                 </c:if>
+                    
+                 <!-- 페이지 숫자 표시 -->
+                 
+                 <c:forEach var = "idx" begin= "${page.getStartPage()}" end = "${page.getEndPage()}">
+					<a href="javascript:page(${idx});" >${idx}</a>
+				 </c:forEach>
+				 
+                 <!-- 오른쪽 화살표 -->
+                 <c:if test="${page.isNext()}">
+                     <a style="text-decoration:none;" href="javascript:page(${page.getEndPage()});">&raquo;</a>
+                 </c:if>
+                    
+             </td>
+         </tr>
+    </tfoot>
+</table>
 
 </div>
 

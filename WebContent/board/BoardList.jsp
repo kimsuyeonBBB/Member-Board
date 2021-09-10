@@ -3,11 +3,21 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>게시글 목록</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+    function page(idx){
+        var pagenum = idx;            
+        location.href="${pageContext.request.contextPath}/board/list?pagenum="+pagenum;
+    }
+</script>
+
 </head>
 <body>
 
@@ -20,7 +30,7 @@
 
 <div style="width:1800px; height:500px; float:left; margin-left:15px">
 <span><h1>게시글 목록</h1></span>  
-<input type="button" value='게시글 작성' onclick='location.href="add"'> 
+<input type="button" value='게시글 작성' onclick='location.href="add"' style='width:90px; height:30px;'> 
 
 
 <hr style="width:1800px; border:3px solid black;"></hr>
@@ -40,7 +50,34 @@ for(Board board : boards){
 <div style="margin-left:35px; width:180px; float:left; text-align:center;"><%=board.getName()%></div><br><br>
 <%}%>
 
+<table>
+    <tfoot>
+         <tr>
+             <td colspan="2">
+                 <!-- 왼쪽 화살표 -->
+                 <c:if test="${page.isPrev()}">
+                     <a style="text-decoration:none;" href="javascript:page(${page.getStartPage()});">&laquo;</a>
+                 </c:if>
+                    
+                 <!-- 페이지 숫자 표시 -->
+                 
+                 <c:forEach var = "idx" begin= "${page.getStartPage()}" end = "${page.getEndPage()}">
+					<a href="javascript:page(${idx});" >${idx}</a>
+				 </c:forEach>
+				 
+                 <!-- 오른쪽 화살표 -->
+                 <c:if test="${page.isNext()}">
+                     <a style="text-decoration:none;" href="javascript:page(${page.getEndPage()});">&raquo;</a>
+                 </c:if>
+                    
+             </td>
+         </tr>
+    </tfoot>
+</table>
+
 </div>
+
+
 
 <jsp:include page="/Tail.jsp"/>
 
