@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import spms.dao.BoardDao;
+import spms.dao.MySqlBoardDao;
 import spms.vo.Board;
 
 @WebServlet("/board/update")
@@ -29,7 +29,7 @@ public class BoardUpdateServlet extends HttpServlet {
 		try {
 			ServletContext sc = this.getServletContext();
 			
-			BoardDao boardDao = (BoardDao) sc.getAttribute("boardDao");
+			MySqlBoardDao boardDao = (MySqlBoardDao) sc.getAttribute("boardDao");
 			Board board = boardDao.selectOne(Integer.parseInt(request.getParameter("no")));
 			
 			request.setAttribute("board", board);
@@ -49,7 +49,7 @@ public class BoardUpdateServlet extends HttpServlet {
 		try {
 			ServletContext sc = this.getServletContext();
 
-			BoardDao boardDao = (BoardDao) sc.getAttribute("boardDao");
+			MySqlBoardDao boardDao = (MySqlBoardDao) sc.getAttribute("boardDao");
 			Board board = (Board)request.getAttribute("board");
 			boardDao.update(board);
 

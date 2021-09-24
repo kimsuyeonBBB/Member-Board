@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import spms.dao.MemberDao;
+import spms.dao.MySqlMemberDao;
 import spms.vo.Member;
 
 //프런트 컨트롤러 적용
@@ -41,7 +41,7 @@ public class MemberListServlet extends HttpServlet{
 			ServletContext sc = this.getServletContext();
 			
 			//직접 MemberDao 객체를 생성하지 않고 ServletContext에 저장된 Dao 객체를 꺼내 쓰는 것으로 변경하였다.
-			MemberDao memberDao = (MemberDao) sc.getAttribute("memberDao");
+			MySqlMemberDao memberDao = (MySqlMemberDao) sc.getAttribute("memberDao");
 			
 			pagemaker.setTotalcount(memberDao.totalCount(cpagenum));
 			pagemaker.setPagenum(cpagenum);

@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import spms.dao.FindDao;
+import spms.dao.MySqlFindDao;
 import spms.vo.Member;
 
 @WebServlet("/auth/findid")
@@ -31,7 +31,7 @@ public class FindIdServlet extends HttpServlet {
 		try {
 			ServletContext sc = this.getServletContext();
 			
-			FindDao findDao = (FindDao) sc.getAttribute("findDao");
+			MySqlFindDao findDao = (MySqlFindDao) sc.getAttribute("findDao");
 			
 			Member member = findDao.findid(
 					request.getParameter("name"),

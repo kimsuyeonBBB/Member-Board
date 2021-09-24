@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import spms.dao.BoardDao;
+import spms.dao.MySqlBoardDao;
 
 @WebServlet("/board/delete")
 public class BoardDeleteServlet extends HttpServlet{
@@ -23,7 +23,7 @@ public class BoardDeleteServlet extends HttpServlet{
 		try {
 			ServletContext sc = this.getServletContext();
 			
-			BoardDao boardDao = (BoardDao) sc.getAttribute("boardDao");
+			MySqlBoardDao boardDao = (MySqlBoardDao) sc.getAttribute("boardDao");
 			
 			boardDao.delete(Integer.parseInt(request.getParameter("no")));
 			

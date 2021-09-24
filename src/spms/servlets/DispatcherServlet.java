@@ -49,20 +49,16 @@ public class DispatcherServlet extends HttpServlet{
 			//즉, MemberListController가 사용할 객체를 준비하여 Map 객체에 담아 전달해준다.
 			ServletContext sc = this.getServletContext();
 			HashMap<String,Object> model = new HashMap<String,Object>();
-			model.put("memberDao",sc.getAttribute("memberDao"));
-			model.put("boardDao", sc.getAttribute("boardDao"));
-			model.put("findDao", sc.getAttribute("findDao"));
+			
 			model.put("session",request.getSession());
 
 			//페이지 컨트롤러는 Controller의 구현체이기 때문에 인터페이스 타입의 참조 변수를 선언한다.
-			Controller pageController = null;
+			Controller pageController = (Controller)sc.getAttribute(servletPath);
 
 			//회원 목록 요청을 처리할 페이지 컨트롤러를 준비한다.
 			if("/member/list.do".equals(servletPath)) {				
-				pageController = new MemberListController();
 				model.put("cpagenum", cpagenum);
 			} else if("/member/add.do".equals(servletPath)){
-				pageController = new MemberAddController();
 				if(request.getParameter("email") != null) {
 					//프런트 컨트롤러의 역할 중 하나는 페이지 컨트롤러가 필요한 데이터를 미리 준비하는 것이다.
 					//요청 매개변수의 값을 꺼내서 VO 객체에 담고, "member"라는 키로 ServletRequest에 보관하였다.
@@ -73,7 +69,6 @@ public class DispatcherServlet extends HttpServlet{
 						.setName(request.getParameter("name")));
 				}
 			} else if("/member/update.do".equals(servletPath)) {
-				pageController = new MemberUpdateController();
 				if(request.getParameter("email") != null) {
 					model.put("member", new Member()
 						.setNo(Integer.parseInt(request.getParameter("no")))
@@ -85,24 +80,17 @@ public class DispatcherServlet extends HttpServlet{
 					model.put("no", new Integer(request.getParameter("no")));
 				}
 			} else if("/member/delete.do".equals(servletPath)) {
-				pageController = new MemberDeleteController();
 				model.put("no", new Integer(request.getParameter("no")));
 			} else if("/auth/login.do".equals(servletPath)) {
-				pageController = new LoginController();
 				if(request.getParameter("id") != null) {
 					model.put("loginInfo", new Member()
 							.setId(request.getParameter("id"))
 							.setPassword(request.getParameter("password")));
 				}
 				
-			} else if("/auth/logout.do".equals(servletPath)) {
-				pageController = new LogoutController();
-				
 			} else if("/board/list.do".equals(servletPath)) {
-				pageController = new BoardListController();
 				model.put("cpagenum", cpagenum);
-			} else if("/board/add.do".equals(servletPath)) {
-				pageController = new BoardAddController();				
+			} else if("/board/add.do".equals(servletPath)) {		
 				if(request.getParameter("title") != null) {
 					model.put("board", new Board()
 							.setTitle(request.getParameter("title"))
@@ -110,7 +98,6 @@ public class DispatcherServlet extends HttpServlet{
 					
 				}
 			} else if("/board/update.do".equals(servletPath)) {
-				pageController = new BoardUpdateController();
 				if(request.getParameter("title") != null) {
 					model.put("board", new Board()
 							.setNo(Integer.parseInt(request.getParameter("no")))
@@ -121,17 +108,14 @@ public class DispatcherServlet extends HttpServlet{
 					model.put("no", new Integer(request.getParameter("no")));
 				}
 			} else if("/board/delete.do".equals(servletPath)) {
-				pageController = new BoardDeleteController();
 				model.put("no", new Integer(request.getParameter("no")));
 			} else if("/auth/findid.do".equals(servletPath)) {
-				pageController = new FindIdController();
 				if(request.getParameter("name") != null) {					
 					model.put("member", new Member()
 							.setName(request.getParameter("name"))
 							.setEmail(request.getParameter("email")));
 				}
 			} else if("/auth/findpwd.do".equals(servletPath)) {
-				pageController = new FindPwdController();
 				if(request.getParameter("name") != null) {
 					model.put("member", new Member()
 							.setName(request.getParameter("name"))

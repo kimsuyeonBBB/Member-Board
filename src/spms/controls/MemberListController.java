@@ -2,15 +2,22 @@ package spms.controls;
 
 import java.util.Map;
 
-import spms.dao.MemberDao;
+import spms.dao.MySqlMemberDao;
 import spms.servlets.PageMaker;
 
 public class MemberListController implements Controller {
-
+	//MemberListController에도 MemberDao를 주입받기 위한 인스턴스 변수와 셋터 메서드를 추가하였다.
+	MySqlMemberDao memberDao;
+	
+	public MemberListController setMemberDao(MySqlMemberDao memberDao) {
+		this.memberDao = memberDao;
+		return this;
+	}
+	
 	@Override
 	public String execute(Map<String, Object> model) throws Exception {
 		PageMaker pagemaker = new PageMaker();
-		MemberDao memberDao = (MemberDao) model.get("memberDao");
+		
 		int cpagenum = (int) model.get("cpagenum");
 		
 		pagemaker.setTotalcount(memberDao.totalCount(cpagenum));

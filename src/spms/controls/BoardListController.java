@@ -4,16 +4,23 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import spms.dao.BoardDao;
+import spms.dao.MySqlBoardDao;
+import spms.dao.MySqlMemberDao;
 import spms.servlets.PageMaker;
 import spms.vo.Member;
 
 public class BoardListController implements Controller {
-
+	MySqlBoardDao boardDao;
+	
+	public BoardListController setBoardDao(MySqlBoardDao boardDao) {
+		this.boardDao = boardDao;
+		return this;
+	}
+	
 	@Override
 	public String execute(Map<String, Object> model) throws Exception {
 		PageMaker pagemaker = new PageMaker();
-		BoardDao boardDao = (BoardDao)model.get("boardDao");
+
 		HttpSession session = (HttpSession) model.get("session");
 		Member member = (Member) session.getAttribute("member");
 		

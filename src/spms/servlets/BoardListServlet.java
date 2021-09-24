@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import spms.dao.BoardDao;
+import spms.dao.MySqlBoardDao;
 import spms.vo.Board;
 import spms.vo.Member;
 
@@ -40,7 +40,7 @@ public class BoardListServlet extends HttpServlet {
 		try {
 			ServletContext sc = this.getServletContext();
 			
-			BoardDao boardDao = (BoardDao) sc.getAttribute("boardDao");
+			MySqlBoardDao boardDao = (MySqlBoardDao) sc.getAttribute("boardDao");
 
 			pagemaker.setTotalcount(boardDao.totalCount(cpagenum,member));
 			pagemaker.setPagenum(cpagenum);

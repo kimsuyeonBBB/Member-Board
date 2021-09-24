@@ -13,9 +13,21 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
-import spms.dao.BoardDao;
-import spms.dao.FindDao;
-import spms.dao.MemberDao;
+import spms.controls.BoardAddController;
+import spms.controls.BoardDeleteController;
+import spms.controls.BoardListController;
+import spms.controls.BoardUpdateController;
+import spms.controls.FindIdController;
+import spms.controls.FindPwdController;
+import spms.controls.LoginController;
+import spms.controls.LogoutController;
+import spms.controls.MemberAddController;
+import spms.controls.MemberDeleteController;
+import spms.controls.MemberListController;
+import spms.controls.MemberUpdateController;
+import spms.dao.MySqlBoardDao;
+import spms.dao.MySqlFindDao;
+import spms.dao.MySqlMemberDao;
 import spms.util.DBConnectionPool;
 
 //AppInitServlet이 하는 일이 모두 여기로 이관되었다.
@@ -34,16 +46,30 @@ public class ContextLoaderListener implements ServletContextListener {
 			InitialContext initialContext = new InitialContext();
 			DataSource ds = (DataSource)initialContext.lookup("java:comp/env/jdbc/memberadmin");
 			
-			MemberDao memberDao = new MemberDao();
-			BoardDao boardDao = new BoardDao();
-			FindDao findDao = new FindDao();
+			MySqlMemberDao memberDao = new MySqlMemberDao();
+			MySqlBoardDao boardDao = new MySqlBoardDao();
+			MySqlFindDao findDao = new MySqlFindDao();
 			memberDao.setDataSource(ds);
 			boardDao.setDataSource(ds);
 			findDao.setDataSource(ds);
 			
-			sc.setAttribute("memberDao", memberDao);
-			sc.setAttribute("boardDao", boardDao);
-			sc.setAttribute("findDao", findDao);
+			//생성된 페이지 컨트롤러를 ServletContext에 저장한다. (서블릿 요청 URL을 키로 하여 저장한다.)
+			//로그아웃은 MemberDao가 필요 없기 때문에 셋터 메서드를 호출하지 않는다.
+			sc.setAttribute("/auth/login.do", new LoginController().setMemberDao(memberDao));
+			sc.setAttribute("/auth/logout.do", new LogoutController());
+			sc.setAttribute("/member/list.do", new MemberListController().setMemberDao(memberDao));
+			sc.setAttribute("/member/add.do", new MemberAddController().setMemberDao(memberDao));
+			sc.setAttribute("/member/update.do", new MemberUpdateController().setMemberDao(memberDao));
+			sc.setAttribute("/member/delete.do", new MemberDeleteController().setMemberDao(memberDao));
+			
+			sc.setAttribute("/board/list.do", new BoardListController().setBoardDao(boardDao));
+			sc.setAttribute("/board/add.do", new BoardAddController().setBoardDao(boardDao));
+			sc.setAttribute("/board/update.do", new BoardUpdateController().setBoardDao(boardDao));
+			sc.setAttribute("/board/delete.do", new BoardDeleteController().setBoardDao(boardDao));
+			
+			sc.setAttribute("/auth/findid.do", new FindIdController().setFindDao(findDao));
+			sc.setAttribute("/auth/findpwd.do", new FindPwdController().setFindDao(findDao));
+			
 		} catch(Throwable e) {
 			e.printStackTrace();
 		}

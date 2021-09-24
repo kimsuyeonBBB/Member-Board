@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import spms.dao.BoardDao;
+import spms.dao.MySqlBoardDao;
 import spms.vo.Board;
 import spms.vo.Member;
 
@@ -36,7 +36,7 @@ public class BoardAddServlet extends HttpServlet {
 			
 			Member member = (Member)session.getAttribute("member");
 			
-			BoardDao boardDao = (BoardDao) sc.getAttribute("boardDao");
+			MySqlBoardDao boardDao = (MySqlBoardDao) sc.getAttribute("boardDao");
 			Board board = (Board)request.getAttribute("board");
 			board.setName(member.getName());
 			boardDao.insert(board);
