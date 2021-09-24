@@ -12,31 +12,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import spms.dao.BoardDao;
+
 @WebServlet("/board/delete")
 public class BoardDeleteServlet extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 	
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-		Connection conn = null;
-		Statement stmt = null;
-		
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{		
 		try {
 			ServletContext sc = this.getServletContext();
-			conn = (Connection) sc.getAttribute("conn");
-			stmt = conn.createStatement();
-			stmt.executeUpdate("DELETE FROM BOARDS WHERE MNO=" + request.getParameter("no"));
 			
-			response.sendRedirect("list");
+			BoardDao boardDao = (BoardDao) sc.getAttribute("boardDao");
+			
+			boardDao.delete(Integer.parseInt(request.getParameter("no")));
+			
+			request.setAttribute("viewUrl", "redirect:list.do");
 		} catch(Exception e) {
-			e.printStackTrace();
-			request.setAttribute("error", e);
-			RequestDispatcher rd = request.getRequestDispatcher("/Error.jsp");
-			rd.forward(request, response);
-			
-		} finally {
-			try {if (stmt != null) stmt.close();} catch(Exception e) {}
-		}
+			throw new ServletException(e);
+		} 
 	}
 	
 

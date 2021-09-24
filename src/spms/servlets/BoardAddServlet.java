@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import spms.dao.BoardDao;
+import spms.vo.Board;
 import spms.vo.Member;
 
 @WebServlet("/board/add")
@@ -21,38 +23,28 @@ public class BoardAddServlet extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-		RequestDispatcher rd = request.getRequestDispatcher("/board/BoardForm.jsp");
-		rd.forward(request, response);
+		request.setAttribute("viewUrl", "/board/BoardForm.jsp");
 	}
 	
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		
 		HttpSession session = request.getSession();
 		
 		try {
 			ServletContext sc = this.getServletContext();
-			conn = (Connection) sc.getAttribute("conn");
+			
 			Member member = (Member)session.getAttribute("member");
 			
-			stmt = conn.prepareStatement("INSERT INTO BOARDS(MNAME,TITLE,STORY,CRE_DATE)" + " VALUES (?,?,?,NOW())");
-			stmt.setString(1, member.getName());
-			stmt.setString(2, request.getParameter("title"));
-			stmt.setString(3, request.getParameter("story"));
-			stmt.executeUpdate();
+			BoardDao boardDao = (BoardDao) sc.getAttribute("boardDao");
+			Board board = (Board)request.getAttribute("board");
+			board.setName(member.getName());
+			boardDao.insert(board);
+
+			request.setAttribute("viewUrl", "redirect:list.do");
 			
-			response.sendRedirect("list");
 		} catch (Exception e) {
-			e.printStackTrace();
-			request.setAttribute("error", e);
-			RequestDispatcher rd = request.getRequestDispatcher("/Error.jsp");
-			rd.forward(request, response);
-			
-		} finally {
-			try {if (stmt != null) stmt.close();} catch(Exception e) {}
+			throw new ServletException(e);
 		}
 	}
 }

@@ -14,7 +14,7 @@
 <script type="text/javascript">
     function page(idx){
         var pagenum = idx;            
-        location.href="${pageContext.request.contextPath}/board/list?pagenum="+pagenum;
+        location.href="${pageContext.request.contextPath}/board/list.do?pagenum="+pagenum;
     }
 </script>
 
@@ -24,13 +24,13 @@
 <jsp:include page="/Header.jsp"/>
 
 <div style="width:200px; height:500px;border-right:2px solid black; float:left;">
-<a href="../member/list" style="font-size:20px; line-height:50px; margin-left:5px;"><i>회원관리</i></a><br>
-<a href="list" style="font-size:20px; line-height:50px; margin-left:5px;"><i>게시판 관리</i></a><br>
+<a href="../member/list.do" style="font-size:20px; line-height:50px; margin-left:5px;"><i>회원관리</i></a><br>
+<a href="list.do" style="font-size:20px; line-height:50px; margin-left:5px;"><i>게시판 관리</i></a><br>
 </div>
 
 <div style="width:1800px; height:500px; float:left; margin-left:15px">
 <span><h1>게시글 목록</h1></span>  
-<input type="button" value='게시글 작성' onclick='location.href="add"' style='width:90px; height:30px;'> 
+<input type="button" value='게시글 작성' onclick='location.href="add.do"' style='width:90px; height:30px;'> 
 
 
 <hr style="width:1800px; border:3px solid black;"></hr>
@@ -45,7 +45,7 @@ getAttribute("boards");
 for(Board board : boards){
 %>
 <div style="margin-left:35px; width:30px; float:left; text-align:center;"><%=board.getNo()%></div>
-<div style="margin-left:70px; width:180px; float:left; text-align:center;"><a href='update?no=<%=board.getNo()%>'><%=board.getTitle()%></a></div>
+<div style="margin-left:70px; width:180px; float:left; text-align:center;"><a href='update.do?no=<%=board.getNo()%>'><%=board.getTitle()%></a></div>
 <div style="margin-left:20px; width:180px; float:left; text-align:center;"><%=board.getCreatedDate()%></div>
 <div style="margin-left:35px; width:180px; float:left; text-align:center;"><%=board.getName()%></div><br><br>
 <%}%>
@@ -76,8 +76,6 @@ for(Board board : boards){
 </table>
 
 </div>
-
-
 
 <jsp:include page="/Tail.jsp"/>
 

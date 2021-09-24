@@ -18,7 +18,6 @@ public class LogOutServlet extends HttpServlet {
 		//세션 객체가 무효화 된다는 것은 HttpSession 객체가 제거된다는 것을 의미한다.
 		session.invalidate();
 		
-		//로그인 입력폼으로 리다이렉트 한다.
-		response.sendRedirect("login");
+		request.setAttribute("viewUrl", "redirect:login.do");
 	}
 }

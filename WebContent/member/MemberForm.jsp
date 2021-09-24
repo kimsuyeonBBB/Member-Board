@@ -13,13 +13,13 @@ Home Page
 </div>
 
 <h1>회원가입</h1>
-<form action='add' method='post'>
+<form action='add.do' method='post'>
 이름 : <input type='text' name='name' style='width:200px;'><br>
 이메일 : <input type='text' name='email' style='margin-top:10px;width:180px;'><br>
 ID : <input type='text' name='id' style='margin-top:10px;width:210px;'><br>
 Password : <input type='password' name='password' style='margin-top:10px; width:160px;'><br>
 <input type='submit' value='완료' style='margin-top:10px'>
-<input type='button' value='취소' onclick='location.href="../auth/login"'>
+<input type='button' value='취소' onclick='location.href="../auth/login.do"'>
 </form>
 
 <div style="background-color:#5D5D5D;height:50px;padding:5px;margin-top:200px">

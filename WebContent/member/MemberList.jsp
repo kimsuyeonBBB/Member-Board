@@ -14,7 +14,7 @@
 <script type="text/javascript">
     function page(idx){
         var pagenum = idx;            
-        location.href="${pageContext.request.contextPath}/member/list?pagenum="+pagenum;
+        location.href="${pageContext.request.contextPath}/member/list.do?pagenum="+pagenum;
     }
 </script>
 
@@ -24,8 +24,8 @@
 <jsp:include page="/Header.jsp"/>
 
 <div style="width:200px; height:500px;border-right:2px solid black; float:left;">
-<a href="list" style="font-size:20px; line-height:50px; margin-left:5px;"><i>회원관리</i></a><br>
-<a href="../board/list" style="font-size:20px; line-height:50px; margin-left:5px;"><i>게시판 관리</i></a><br>
+<a href="list.do" style="font-size:20px; line-height:50px; margin-left:5px;"><i>회원관리</i></a><br>
+<a href="../board/list.do" style="font-size:20px; line-height:50px; margin-left:5px;"><i>게시판 관리</i></a><br>
 </div>
 
 <div style="width:1800px; height:500px; float:left; margin-left:15px">
@@ -44,14 +44,14 @@ getAttribute("members");
 for(Member member : members){
 %>
 <div style="margin-left:35px; width:30px; float:left; text-align:center;"><%=member.getNo()%></div> 
-<div style="margin-left:70px; width:180px; float:left; text-align:center;"><a href='update?no=<%=member.getNo()%>'><%=member.getName()%></a></div>
+<div style="margin-left:70px; width:180px; float:left; text-align:center;"><a href='update.do?no=<%=member.getNo()%>'><%=member.getName()%></a></div>
 <div style="margin-left:20px; width:180px; float:left; text-align:center;"><%=member.getEmail()%></div> 
 <div style="margin-left:40px; width:180px; float:left; text-align:center;"><%=member.getCreatedDate()%></div> 
 <a href="#" onclick="removeCheck()">[삭제]</a><br><br>
 <script type="text/javascript">
 function removeCheck(){
 	if(confirm("삭제하시겠습니까?") == true){ //'확인' 클릭 시
-		location.href='delete?no=<%=member.getNo()%>';
+		location.href='delete.do?no=<%=member.getNo()%>';
 	} else{  //'취소' 클릭 시
 		return false;
 	}

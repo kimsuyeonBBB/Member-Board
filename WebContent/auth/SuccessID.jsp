@@ -9,7 +9,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="Refresh" content="5;url=login">
+<meta http-equiv="Refresh" content="5;url=login.do">
 <title>ID 찾기 성공!</title>
 </head>
 <body>

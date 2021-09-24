@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="Refresh" content="3;url=findpwd">
+<meta http-equiv="Refresh" content="3;url=findpwd.do">
 <title>Password 찾기 실패</title>
 </head>
 <body>

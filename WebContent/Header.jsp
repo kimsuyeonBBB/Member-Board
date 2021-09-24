@@ -11,6 +11,6 @@ Home Page
 <span style="float:right; font-size:20px; margin-top:20px">
 <%=member.getName()%>
 <a style="color:white;"
-   href="<%=request.getContextPath()%>/auth/logout">로그아웃</a>
+   href="<%=request.getContextPath()%>/auth/logout.do">로그아웃</a>
 </span>
 </div>    

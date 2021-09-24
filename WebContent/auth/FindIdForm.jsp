@@ -14,11 +14,11 @@ Home Page
 </div>
 
 <h1>ID 찾기</h1>
-<form action='findid' method='post'>
+<form action='findid.do' method='post'>
 이름 : <input type='text' name='name' style='width:200px;'><br>
 이메일 : <input type='text' name='email' style='margin-top:10px;width:180px;'><br>
 <input type='submit' value='확인' style='margin-top:10px;'>
-<input type='button' value='취소' onclick='location.href="login"'>
+<input type='button' value='취소' onclick='location.href="login.do"'>
 </form>
 
 <div style="background-color:#5D5D5D;height:50px;padding:5px;margin-top:200px">

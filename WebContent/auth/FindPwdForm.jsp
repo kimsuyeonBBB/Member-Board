@@ -14,12 +14,12 @@ Home Page
 </div>
 
 <h1>Password 찾기</h1>
-<form action='findpwd' method='post'>
+<form action='findpwd.do' method='post'>
 이름 : <input type='text' name='name' style='width:200px;'><br>
 이메일 : <input type='text' name='email' style='margin-top:10px;width:180px;'><br>
 ID : <input type='text' name='id' style='margin-top:10px;width:210px;'><br>
 <input type='submit' value='확인' style='margin-top:10px'>
-<input type='button' value='취소' onclick='location.href="login"'>
+<input type='button' value='취소' onclick='location.href="login.do"'>
 </form>
 
 <div style="background-color:#5D5D5D;height:50px;padding:5px;margin-top:200px">

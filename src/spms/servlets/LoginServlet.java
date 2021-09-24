@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import spms.dao.MemberDao;
 import spms.vo.Member;
 
 @WebServlet("/auth/login")
@@ -31,40 +32,27 @@ public class LoginServlet extends HttpServlet{
 	//doPost()에서는 데이터베이스로부터 회원정보를 조회한다.
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		
+
 		try {
 			ServletContext sc = this.getServletContext();
-			conn = (Connection) sc.getAttribute("conn");
-			stmt = conn.prepareStatement("SELECT MNAME, EMAIL FROM MEM_AD" + " WHERE ID=? AND PWD=?");
-			stmt.setString(1, request.getParameter("id"));
-			stmt.setString(2, request.getParameter("password"));
 			
-			rs = stmt.executeQuery();
-			if(rs.next()) {
-				//만약 아이디과 암호가 일치하는 회원을 찾는다면 값 객체 Member에 회원 정보를 담는다.
-				Member member = new Member()
-						.setEmail(rs.getString("EMAIL"))
-						.setName(rs.getString("MNAME"));
-				//그리고 Member 객체를 HttpSession에 보관한다.
+			MemberDao memberDao = (MemberDao) sc.getAttribute("memberDao");
+			
+			Member member = memberDao.exist(
+					request.getParameter("id"), 
+					request.getParameter("password"));
+			
+			if(member != null) {
 				HttpSession session = request.getSession();
 				session.setAttribute("member", member);
-				
-				//로그인 성공이면 /member/list로 리다이렉트한다.
-				response.sendRedirect("../member/list");
+
+				request.setAttribute("viewUrl", "redirect:../member/list.do");
 			} else {
-				//로그인에 실패하면 /auth/LogInFail.jsp로 포워딩한다.
-				RequestDispatcher rd = request.getRequestDispatcher("/auth/LogInFail.jsp");
-				rd.forward(request, response);
+				request.setAttribute("viewUrl", "/auth/LogInFail.jsp");
 			}
 		} catch(Exception e) {
 			throw new ServletException(e);
-		} finally {
-			try {if (rs != null) rs.close();} catch(Exception e) {}
-			try {if (stmt != null) stmt.close();} catch(Exception e) {}
-		}
+		} 
 	}
 
 }
