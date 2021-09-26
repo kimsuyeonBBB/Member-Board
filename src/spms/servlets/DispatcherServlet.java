@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import spms.bind.DataBinding;
+import spms.bind.ServletRequestDataBinder;
 import spms.controls.BoardAddController;
 import spms.controls.BoardDeleteController;
 import spms.controls.BoardListController;
@@ -42,86 +44,23 @@ public class DispatcherServlet extends HttpServlet{
 		String servletPath = request.getServletPath();
 		
 		String cpagenumgg = request.getParameter("pagenum") != null ? request.getParameter("pagenum")  : "1" ;
-		int cpagenum = Integer.parseInt(cpagenumgg);
+		Integer cpagenum = Integer.parseInt(cpagenumgg);
 		
 		try {
 			//프런트 컨트롤러와 페이지 컨트롤러 사이에 데이터나 객체를 주고 받을 때 사용할 Map 객체를 준비한다.
 			//즉, MemberListController가 사용할 객체를 준비하여 Map 객체에 담아 전달해준다.
 			ServletContext sc = this.getServletContext();
-			HashMap<String,Object> model = new HashMap<String,Object>();
 			
+			HashMap<String,Object> model = new HashMap<String,Object>();			
 			model.put("session",request.getSession());
 
 			//페이지 컨트롤러는 Controller의 구현체이기 때문에 인터페이스 타입의 참조 변수를 선언한다.
 			Controller pageController = (Controller)sc.getAttribute(servletPath);
 
-			//회원 목록 요청을 처리할 페이지 컨트롤러를 준비한다.
-			if("/member/list.do".equals(servletPath)) {				
-				model.put("cpagenum", cpagenum);
-			} else if("/member/add.do".equals(servletPath)){
-				if(request.getParameter("email") != null) {
-					//프런트 컨트롤러의 역할 중 하나는 페이지 컨트롤러가 필요한 데이터를 미리 준비하는 것이다.
-					//요청 매개변수의 값을 꺼내서 VO 객체에 담고, "member"라는 키로 ServletRequest에 보관하였다.
-					model.put("member", new Member()
-						.setEmail(request.getParameter("email"))
-						.setId(request.getParameter("id"))
-						.setPassword(request.getParameter("password"))
-						.setName(request.getParameter("name")));
-				}
-			} else if("/member/update.do".equals(servletPath)) {
-				if(request.getParameter("email") != null) {
-					model.put("member", new Member()
-						.setNo(Integer.parseInt(request.getParameter("no")))
-						.setEmail(request.getParameter("email"))
-						.setId(request.getParameter("id"))
-						.setPassword(request.getParameter("password"))
-						.setName(request.getParameter("name")));
-				} else {
-					model.put("no", new Integer(request.getParameter("no")));
-				}
-			} else if("/member/delete.do".equals(servletPath)) {
-				model.put("no", new Integer(request.getParameter("no")));
-			} else if("/auth/login.do".equals(servletPath)) {
-				if(request.getParameter("id") != null) {
-					model.put("loginInfo", new Member()
-							.setId(request.getParameter("id"))
-							.setPassword(request.getParameter("password")));
-				}
-				
-			} else if("/board/list.do".equals(servletPath)) {
-				model.put("cpagenum", cpagenum);
-			} else if("/board/add.do".equals(servletPath)) {		
-				if(request.getParameter("title") != null) {
-					model.put("board", new Board()
-							.setTitle(request.getParameter("title"))
-							.setStory(request.getParameter("story")));
-					
-				}
-			} else if("/board/update.do".equals(servletPath)) {
-				if(request.getParameter("title") != null) {
-					model.put("board", new Board()
-							.setNo(Integer.parseInt(request.getParameter("no")))
-							.setTitle(request.getParameter("title"))
-							.setStory(request.getParameter("story")));
-				}
-				else {
-					model.put("no", new Integer(request.getParameter("no")));
-				}
-			} else if("/board/delete.do".equals(servletPath)) {
-				model.put("no", new Integer(request.getParameter("no")));
-			} else if("/auth/findid.do".equals(servletPath)) {
-				if(request.getParameter("name") != null) {					
-					model.put("member", new Member()
-							.setName(request.getParameter("name"))
-							.setEmail(request.getParameter("email")));
-				}
-			} else if("/auth/findpwd.do".equals(servletPath)) {
-				if(request.getParameter("name") != null) {
-					model.put("member", new Member()
-							.setName(request.getParameter("name"))
-							.setEmail(request.getParameter("email"))
-							.setId(request.getParameter("id")));
-				}
+			//DataBinding을 구현했는지 여부를 검사하여, 해당 인터페이스를 구현한 경우에만 prepareRequestData()를 호출하여 페이지 컨트롤러를 위한 데이터를 준비했다.
+			if(pageController instanceof DataBinding) {
+				//데이터 준비를 자동으로 수행하는 prepareRequestData()를 호출한다.
+				prepareRequestData(request, model, (DataBinding)pageController);
 			}
 			
 			//MemberListController가 일반 클래스이기 때문에 메서드를 호출해야 한다. (인터페이스에 정해진대로 execute() 메서드를 호출)
@@ -147,6 +86,26 @@ public class DispatcherServlet extends HttpServlet{
 			request.setAttribute("error", e);
 			RequestDispatcher rd = request.getRequestDispatcher("/Error.jsp");
 			rd.forward(request, response);
+		}
+	}
+	
+	private void prepareRequestData(HttpServletRequest request, HashMap<String, Object> model, DataBinding dataBinding) throws Exception{
+		//먼저 페이지 컨트롤러에게 필요한 데이터가 뭔지 묻는다.
+		//getDataBinders() 메서드가 반환하는 것은 Object 배열이다.
+		Object[] dataBinders = dataBinding.getDataBinders();
+		
+		//배열을 반복하기 전에 배열에서 꺼낸 값을 보관할 임시 변수를 준비한다.
+		String dataName = null;
+		Class<?> dataType = null;
+		Object dataObj = null;
+		
+		for (int i=0; i<dataBinders.length; i+=2) {
+			dataName = (String)dataBinders[i];
+			dataType = (Class<?>) dataBinders[i+1];
+			dataObj = ServletRequestDataBinder.bind(request, dataType, dataName);
+			//bind() 메서드가 반환한 데이터 객체는 Map 객체에 담는다.
+			//이 작업을 통해 페이지 컨트롤러가 사용할 데이터를 준비한다.
+			model.put(dataName, dataObj);
 		}
 	}
 	

@@ -2,10 +2,11 @@ package spms.controls;
 
 import java.util.Map;
 
+import spms.bind.DataBinding;
 import spms.dao.MySqlFindDao;
 import spms.vo.Member;
 
-public class FindPwdController implements Controller {
+public class FindPwdController implements Controller,DataBinding {
 	MySqlFindDao findDao;
 	
 	public FindPwdController setFindDao(MySqlFindDao findDao) {
@@ -14,12 +15,20 @@ public class FindPwdController implements Controller {
 	}
 	
 	@Override
+	public Object[] getDataBinders() {
+		return new Object[] {
+			"member",spms.vo.Member.class
+		};
+	}
+	
+	@Override
 	public String execute(Map<String, Object> model) throws Exception {
-		if(model.get("member") == null) {
+		Member member = (Member) model.get("member");
+		
+		if(member.getName() == null) {
 			return "/auth/FindPwdForm.jsp";
 		}
 		else {
-			Member member = (Member) model.get("member");
 			Member result = findDao.findpw(member.getName(),member.getEmail(), member.getId());
 			
 			if(result != null) {

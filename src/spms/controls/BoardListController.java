@@ -4,17 +4,25 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import spms.bind.DataBinding;
 import spms.dao.MySqlBoardDao;
 import spms.dao.MySqlMemberDao;
 import spms.servlets.PageMaker;
 import spms.vo.Member;
 
-public class BoardListController implements Controller {
+public class BoardListController implements Controller,DataBinding {
 	MySqlBoardDao boardDao;
 	
 	public BoardListController setBoardDao(MySqlBoardDao boardDao) {
 		this.boardDao = boardDao;
 		return this;
+	}
+	
+	@Override
+	public Object[] getDataBinders() {
+		return new Object[] {
+				"pagenum",Integer.class
+		};
 	}
 	
 	@Override
@@ -24,7 +32,7 @@ public class BoardListController implements Controller {
 		HttpSession session = (HttpSession) model.get("session");
 		Member member = (Member) session.getAttribute("member");
 		
-		int cpagenum = (int) model.get("cpagenum");
+		int cpagenum = (int) model.get("pagenum");
 		
 		pagemaker.setTotalcount(boardDao.totalCount(cpagenum,member));
 		pagemaker.setPagenum(cpagenum);
@@ -40,5 +48,7 @@ public class BoardListController implements Controller {
 		
 		return "/board/BoardList.jsp";
 	}
+
+	
 
 }

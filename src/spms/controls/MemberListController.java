@@ -2,10 +2,11 @@ package spms.controls;
 
 import java.util.Map;
 
+import spms.bind.DataBinding;
 import spms.dao.MySqlMemberDao;
 import spms.servlets.PageMaker;
 
-public class MemberListController implements Controller {
+public class MemberListController implements Controller,DataBinding {
 	//MemberListController에도 MemberDao를 주입받기 위한 인스턴스 변수와 셋터 메서드를 추가하였다.
 	MySqlMemberDao memberDao;
 	
@@ -15,11 +16,19 @@ public class MemberListController implements Controller {
 	}
 	
 	@Override
+	public Object[] getDataBinders() {
+		return new Object[] {
+			"pagenum",Integer.class	
+		};
+	}
+	
+	@Override
 	public String execute(Map<String, Object> model) throws Exception {
+//		System.exit(0);
 		PageMaker pagemaker = new PageMaker();
-		
-		int cpagenum = (int) model.get("cpagenum");
-		
+
+		Integer cpagenum = (Integer) model.get("pagenum");
+				
 		pagemaker.setTotalcount(memberDao.totalCount(cpagenum));
 		pagemaker.setPagenum(cpagenum);
 		pagemaker.setCurrentblock(cpagenum);
@@ -33,5 +42,6 @@ public class MemberListController implements Controller {
 		model.put("page", pagemaker);
 		return "/member/MemberList.jsp";
 	}
+
 	
 }

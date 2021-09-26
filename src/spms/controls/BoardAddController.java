@@ -4,11 +4,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import spms.bind.DataBinding;
 import spms.dao.MySqlBoardDao;
 import spms.vo.Board;
 import spms.vo.Member;
 
-public class BoardAddController implements Controller {
+public class BoardAddController implements Controller,DataBinding {
 	MySqlBoardDao boardDao;
 	
 	public BoardAddController setBoardDao(MySqlBoardDao boardDao) {
@@ -17,15 +18,23 @@ public class BoardAddController implements Controller {
 	}
 	
 	@Override
+	public Object[] getDataBinders() {
+		return new Object[] {
+				"board",spms.vo.Board.class
+		};
+	}
+	
+	@Override
 	public String execute(Map<String, Object> model) throws Exception {
-		if(model.get("board") == null) {
+		Board board = (Board) model.get("board");
+		
+		if(board.getTitle() == null) {
 			return "/board/BoardForm.jsp";
 		}
 		else {
 			HttpSession session = (HttpSession) model.get("session");
 			Member member = (Member)session.getAttribute("member");
-			
-			Board board = (Board) model.get("board");
+						
 			board.setName(member.getName());
 			boardDao.insert(board);
 			
@@ -33,4 +42,5 @@ public class BoardAddController implements Controller {
 		}
 	}
 
+	
 }

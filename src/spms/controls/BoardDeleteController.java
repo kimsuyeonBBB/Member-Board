@@ -2,14 +2,22 @@ package spms.controls;
 
 import java.util.Map;
 
+import spms.bind.DataBinding;
 import spms.dao.MySqlBoardDao;
 
-public class BoardDeleteController implements Controller {
+public class BoardDeleteController implements Controller,DataBinding {
 	MySqlBoardDao boardDao;
 	
 	public BoardDeleteController setBoardDao(MySqlBoardDao boardDao) {
 		this.boardDao = boardDao;
 		return this;
+	}
+	
+	@Override
+	public Object[] getDataBinders() {
+		return new Object[] {
+				"no",Integer.class
+		};
 	}
 	
 	@Override
@@ -20,4 +28,5 @@ public class BoardDeleteController implements Controller {
 		return "redirect:list.do";
 	}
 
+	
 }
