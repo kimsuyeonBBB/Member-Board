@@ -4,9 +4,14 @@ import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+
+import org.reflections.Reflections;
+
+import spms.annotation.Component;
 
 //프로퍼티 파일에 설정된 객체를 준비하는 일을 한다.
 //ApplicationContext()를 만든 이유는 페이지 컨트롤러나 DAO가 추가되더라도 ContextLoaderListener를 변경하지 않기 위함이다.
@@ -28,7 +33,24 @@ public class ApplicationContext {
 		props.load(new FileReader(propertiesPath));
 		
 		prepareObjects(props);
+		prepareAnnotaionObjects();
 		injectDependency();
+	}
+	
+	//애노테이션이 붙은 클래스를 찾아서 객체를 준비하는 메서드
+	//Reflections라는 오픈 소스 라이브러리 사용
+	private void prepareAnnotaionObjects() throws Exception{
+		Reflections reflector = new Reflections("");
+		
+		Set<Class<?>> list = reflector.getTypesAnnotatedWith(Component.class);
+		String key = null;
+		
+		for(Class<?> clazz : list) {
+			//클래스로부터 애노테이션 추출해서 속성값을 꺼낸다.
+			key = clazz.getAnnotation(Component.class).value();
+			//애노테이션을 통해 알아낸 객체 이름(key)으로 인스턴스를 저장한다.
+			objTable.put(key, clazz.newInstance());
+		}
 	}
 	
 	//프로퍼티 파일을 로딩했으면 그에 따라 객체를 준비해야 한다.

@@ -11,11 +11,12 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import spms.annotation.Component;
 import spms.servlets.PageMaker;
 import spms.util.DBConnectionPool;
 import spms.vo.Member;
 
-
+@Component("memberDao")
 public class MySqlMemberDao implements MemberDao{
 	//외부로부터 Connection 객체를 주입 받기 위한 셋터 메서드와 인스턴스 변수 준비 (의존성 주입/DI)
 	DataSource ds;

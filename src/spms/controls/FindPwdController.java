@@ -2,10 +2,12 @@ package spms.controls;
 
 import java.util.Map;
 
+import spms.annotation.Component;
 import spms.bind.DataBinding;
 import spms.dao.MySqlFindDao;
 import spms.vo.Member;
 
+@Component("/auth/findpwd.do")
 public class FindPwdController implements Controller,DataBinding {
 	MySqlFindDao findDao;
 	

@@ -4,12 +4,14 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import spms.annotation.Component;
 import spms.bind.DataBinding;
 import spms.dao.MySqlBoardDao;
 import spms.dao.MySqlMemberDao;
 import spms.servlets.PageMaker;
 import spms.vo.Member;
 
+@Component("/board/list.do")
 public class BoardListController implements Controller,DataBinding {
 	MySqlBoardDao boardDao;
 	

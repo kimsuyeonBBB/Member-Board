@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 
 import javax.sql.DataSource;
 
+import spms.annotation.Component;
 import spms.util.DBConnectionPool;
 import spms.vo.Member;
 
+@Component("findDao")
 public class MySqlFindDao implements FindDao{
 	DataSource ds;
 	

@@ -2,9 +2,11 @@ package spms.controls;
 
 import java.util.Map;
 
+import spms.annotation.Component;
 import spms.bind.DataBinding;
 import spms.dao.MySqlBoardDao;
 
+@Component("/board/delete.do")
 public class BoardDeleteController implements Controller,DataBinding {
 	MySqlBoardDao boardDao;
 	

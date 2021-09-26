@@ -2,10 +2,12 @@ package spms.controls;
 
 import java.util.Map;
 
+import spms.annotation.Component;
 import spms.bind.DataBinding;
 import spms.dao.MySqlMemberDao;
 import spms.servlets.PageMaker;
 
+@Component("/member/list.do")
 public class MemberListController implements Controller,DataBinding {
 	//MemberListController에도 MemberDao를 주입받기 위한 인스턴스 변수와 셋터 메서드를 추가하였다.
 	MySqlMemberDao memberDao;

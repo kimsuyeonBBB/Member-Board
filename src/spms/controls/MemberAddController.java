@@ -2,10 +2,12 @@ package spms.controls;
 
 import java.util.Map;
 
+import spms.annotation.Component;
 import spms.bind.DataBinding;
 import spms.dao.MySqlMemberDao;
 import spms.vo.Member;
 
+@Component("/member/add.do")
 //클라이언트가 보낸 데이터를 프런트 컨트롤러로부터 받아야하기 때문에 정의한 규칙에 따라 DataBinding 인터페이스를 구현한다.
 public class MemberAddController implements Controller, DataBinding{
 	MySqlMemberDao memberDao;
