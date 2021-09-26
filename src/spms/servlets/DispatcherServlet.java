@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import spms.bind.DataBinding;
 import spms.bind.ServletRequestDataBinder;
+import spms.context.ApplicationContext;
 import spms.controls.BoardAddController;
 import spms.controls.BoardDeleteController;
 import spms.controls.BoardListController;
@@ -27,6 +28,7 @@ import spms.controls.MemberAddController;
 import spms.controls.MemberDeleteController;
 import spms.controls.MemberListController;
 import spms.controls.MemberUpdateController;
+import spms.listeners.ContextLoaderListener;
 import spms.vo.Board;
 import spms.vo.Member;
 
@@ -47,15 +49,18 @@ public class DispatcherServlet extends HttpServlet{
 		Integer cpagenum = Integer.parseInt(cpagenumgg);
 		
 		try {
-			//프런트 컨트롤러와 페이지 컨트롤러 사이에 데이터나 객체를 주고 받을 때 사용할 Map 객체를 준비한다.
-			//즉, MemberListController가 사용할 객체를 준비하여 Map 객체에 담아 전달해준다.
-			ServletContext sc = this.getServletContext();
+			//ContextLoaderListener의 getApplicationContext()를 호출해서 ApplicationContext 객체를 꺼낸다.
+			ApplicationContext ctx = ContextLoaderListener.getApplicationContext();
 			
 			HashMap<String,Object> model = new HashMap<String,Object>();			
 			model.put("session",request.getSession());
 
 			//페이지 컨트롤러는 Controller의 구현체이기 때문에 인터페이스 타입의 참조 변수를 선언한다.
-			Controller pageController = (Controller)sc.getAttribute(servletPath);
+			Controller pageController = (Controller)ctx.getBean(servletPath);
+			
+			if(pageController == null) {
+				throw new Exception("요청한 서비스를 찾을 수 없습니다.");
+			}
 
 			//DataBinding을 구현했는지 여부를 검사하여, 해당 인터페이스를 구현한 경우에만 prepareRequestData()를 호출하여 페이지 컨트롤러를 위한 데이터를 준비했다.
 			if(pageController instanceof DataBinding) {

@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 
+import spms.context.ApplicationContext;
 import spms.controls.BoardAddController;
 import spms.controls.BoardDeleteController;
 import spms.controls.BoardListController;
@@ -33,6 +34,13 @@ import spms.util.DBConnectionPool;
 //AppInitServlet이 하는 일이 모두 여기로 이관되었다.
 @WebListener
 public class ContextLoaderListener implements ServletContextListener {
+	static ApplicationContext applicationContext;
+	
+	//이 메서드는 ContextLoaderListener에서 만든 ApplicationContext 객체를 얻을 때 사용한다.
+	//당장 프런트 컨트롤러에서 사용해야 한다. 클래스 이름만으로 호출할 수 있게 static으로 선언했다.
+	public static ApplicationContext getApplicationContext() {
+		return applicationContext;
+	}
 	
 	//DB Connection 준비하는 코드 작성
 	//ContextLoaderListener의 contextInitialized()는 웹 애플리케이션이 시작될 때 호출되는 메서드이다.
@@ -42,33 +50,15 @@ public class ContextLoaderListener implements ServletContextListener {
 		try {
 			ServletContext sc = event.getServletContext();
 			
-			//톰캣 서버에서 자원을 찾기 위해 InitialContext 객체 생성
-			InitialContext initialContext = new InitialContext();
-			DataSource ds = (DataSource)initialContext.lookup("java:comp/env/jdbc/memberadmin");
+			//프로퍼티 파일의 이름과 경로 정보도 web.xml 파일로부터 읽어오게 처리하였다.
+			//ServletContext의 getInitParameter()를 호출해서 web.xml에 설정된 매개변수 정보를 가져온다.
+			String propertiesPath = sc.getRealPath(sc.getInitParameter("contextConfigLocation"));
+			//그리고 ApplicationContext 객체를 생성할 때 생성자의 매개변수로 넘겨준다.
+			applicationContext = new ApplicationContext(propertiesPath);
+			//이렇게 생성한 ApplicationContext 객체는 프런트 컨트롤러에서 사용할 수 있게 ContextLoaderListener의 클래스 변수 'applicationContext'에 저장된다.
 			
-			MySqlMemberDao memberDao = new MySqlMemberDao();
-			MySqlBoardDao boardDao = new MySqlBoardDao();
-			MySqlFindDao findDao = new MySqlFindDao();
-			memberDao.setDataSource(ds);
-			boardDao.setDataSource(ds);
-			findDao.setDataSource(ds);
-			
-			//생성된 페이지 컨트롤러를 ServletContext에 저장한다. (서블릿 요청 URL을 키로 하여 저장한다.)
-			//로그아웃은 MemberDao가 필요 없기 때문에 셋터 메서드를 호출하지 않는다.
-			sc.setAttribute("/auth/login.do", new LoginController().setMemberDao(memberDao));
-			sc.setAttribute("/auth/logout.do", new LogoutController());
-			sc.setAttribute("/member/list.do", new MemberListController().setMemberDao(memberDao));
-			sc.setAttribute("/member/add.do", new MemberAddController().setMemberDao(memberDao));
-			sc.setAttribute("/member/update.do", new MemberUpdateController().setMemberDao(memberDao));
-			sc.setAttribute("/member/delete.do", new MemberDeleteController().setMemberDao(memberDao));
-			
-			sc.setAttribute("/board/list.do", new BoardListController().setBoardDao(boardDao));
-			sc.setAttribute("/board/add.do", new BoardAddController().setBoardDao(boardDao));
-			sc.setAttribute("/board/update.do", new BoardUpdateController().setBoardDao(boardDao));
-			sc.setAttribute("/board/delete.do", new BoardDeleteController().setBoardDao(boardDao));
-			
-			sc.setAttribute("/auth/findid.do", new FindIdController().setFindDao(findDao));
-			sc.setAttribute("/auth/findpwd.do", new FindPwdController().setFindDao(findDao));
+			//더이상 이 클래스를 변경할 필요가 없다.
+			//페이지 컨트롤러나 DAO 등을 추가할 때는 프로퍼티 파일에 그 클래스에 대한 정보를 한줄 추가하면 자동으로 그 객체가 생성된다.
 			
 		} catch(Throwable e) {
 			e.printStackTrace();
