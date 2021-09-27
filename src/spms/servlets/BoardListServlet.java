@@ -42,7 +42,7 @@ public class BoardListServlet extends HttpServlet {
 			
 			MySqlBoardDao boardDao = (MySqlBoardDao) sc.getAttribute("boardDao");
 
-			pagemaker.setTotalcount(boardDao.totalCount(cpagenum,member));
+			pagemaker.setTotalcount(boardDao.totalCount(member.getName()));
 			pagemaker.setPagenum(cpagenum);
 			pagemaker.setCurrentblock(cpagenum);
 			pagemaker.setLastblock(pagemaker.getTotalcount());
@@ -54,7 +54,7 @@ public class BoardListServlet extends HttpServlet {
 			//List<Board> list = new ArrayList<>(boards.subList((cpagenum * 5)-5,cpagenum * 5));
 			//System.out.println(list);
 			//request에 회원 목록 데이터 보관한다.
-			request.setAttribute("boards", boardDao.selectList(cpagenum, pagemaker, member));
+			request.setAttribute("boards", boardDao.selectList(cpagenum, member.getName()));
 			request.setAttribute("page", pagemaker);
 			request.setAttribute("viewUrl", "/board/BoardList.jsp");
 

@@ -36,7 +36,7 @@ public class BoardListController implements Controller,DataBinding {
 		
 		int cpagenum = (int) model.get("pagenum");
 		
-		pagemaker.setTotalcount(boardDao.totalCount(cpagenum,member));
+		pagemaker.setTotalcount(boardDao.totalCount(member.getName()));
 		pagemaker.setPagenum(cpagenum);
 		pagemaker.setCurrentblock(cpagenum);
 		pagemaker.setLastblock(pagemaker.getTotalcount());
@@ -45,7 +45,7 @@ public class BoardListController implements Controller,DataBinding {
 		pagemaker.setStartPage(pagemaker.getCurrentblock());
 		pagemaker.setEndPage(pagemaker.getLastblock(),pagemaker.getCurrentblock());
 		
-		model.put("boards", boardDao.selectList(cpagenum, pagemaker, member));
+		model.put("boards", boardDao.selectList(cpagenum, member.getName()));
 		model.put("page", pagemaker);
 		
 		return "/board/BoardList.jsp";

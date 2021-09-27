@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="spms.dao.MemberDao">
+	<resultMap type="member" id="memberResultMap">
+		<id column="MNO" property="no"/>
+		<result column="MNAME" property="name"/>
+		<result column="EMAIL" property="email"/>
+		<result column="ID" property="id"/>
+		<result column="PWD" property="password"/>
+		<result column="CRE_DATE" property="createdDate" javaType="java.sql.Date"/>
+		<result column="MOD_DATE" property="modifiedDate" javaType="java.sql.Date"/>
+	</resultMap>
+	
+	<select id="selectList" parameterType="int" resultMap="memberResultMap">
+		select MNO, MNAME, EMAIL, CRE_DATE
+		from MEM_AD
+		order by MNO asc
+		limit #{value},5
+	</select>
+	
+	<insert id="insert" parameterType="member">
+		insert into MEM_AD(MNAME, EMAIL,ID, PWD, CRE_DATE, MOD_DATE)
+		values (#{name},#{email},#{id},#{password},now(),now())
+	</insert>
+	
+	<select id="selectOne" parameterType="int" resultMap="memberResultMap">
+		select  MNO,MNAME,EMAIL,ID,PWD,CRE_DATE
+		from MEM_AD
+		where MNO=#{value}
+	</select>
+	
+	<update id="update" parameterType="member">
+		update MEM_AD set
+			MNAME=#{name},
+			EMAIL=#{email},
+			ID=#{id},
+			PWD=#{password}, 
+			MOD_DATE=now()
+		where MNO=#{no}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from MEM_AD
+		where MNO=#{value}
+	</delete>
+	
+	<select id="totalCount" resultMap="memberResultMap">
+		select MNO,MNAME,EMAIL,CRE_DATE
+		from MEM_AD
+		order by MNO asc
+	</select>
+	
+	<select id="exist" parameterType="member" resultMap="memberResultMap">
+		select MNAME,EMAIL FROM MEM_AD
+		where ID=#{id} and PWD=#{password}
+	</select>
+</mapper>

@@ -37,10 +37,9 @@ public class LoginServlet extends HttpServlet{
 			ServletContext sc = this.getServletContext();
 			
 			MySqlMemberDao memberDao = (MySqlMemberDao) sc.getAttribute("memberDao");
+			Member loginInfo = (Member) sc.getAttribute("loginInfo");
 			
-			Member member = memberDao.exist(
-					request.getParameter("id"), 
-					request.getParameter("password"));
+			Member member = memberDao.exist(loginInfo);
 			
 			if(member != null) {
 				HttpSession session = request.getSession();

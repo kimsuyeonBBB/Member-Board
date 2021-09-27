@@ -1,11 +1,13 @@
 package spms.controls;
 
+import java.util.List;
 import java.util.Map;
 
 import spms.annotation.Component;
 import spms.bind.DataBinding;
 import spms.dao.MySqlMemberDao;
 import spms.servlets.PageMaker;
+import spms.vo.Member;
 
 @Component("/member/list.do")
 public class MemberListController implements Controller,DataBinding {
@@ -30,8 +32,8 @@ public class MemberListController implements Controller,DataBinding {
 		PageMaker pagemaker = new PageMaker();
 
 		Integer cpagenum = (Integer) model.get("pagenum");
-				
-		pagemaker.setTotalcount(memberDao.totalCount(cpagenum));
+
+		pagemaker.setTotalcount(memberDao.totalCount());
 		pagemaker.setPagenum(cpagenum);
 		pagemaker.setCurrentblock(cpagenum);
 		pagemaker.setLastblock(pagemaker.getTotalcount());
@@ -40,7 +42,7 @@ public class MemberListController implements Controller,DataBinding {
 		pagemaker.setStartPage(pagemaker.getCurrentblock());
 		pagemaker.setEndPage(pagemaker.getLastblock(),pagemaker.getCurrentblock());
 		
-		model.put("members", memberDao.selectList(cpagenum, pagemaker));
+		model.put("members", memberDao.selectList(cpagenum));
 		model.put("page", pagemaker);
 		return "/member/MemberList.jsp";
 	}

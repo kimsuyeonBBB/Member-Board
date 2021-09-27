@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="spms.dao.BoardDao">
+	<resultMap type="board" id="boardResultMap">
+		<id column="MNO" property="no"/>
+		<result column="MNAME" property="name"/>
+		<result column="TITLE" property="title"/>
+		<result column="STORY" property="story"/>
+		<result column="CRE_DATE" property="createdDate" javaType="java.sql.Date"/>
+	</resultMap>
+	
+	<select id="selectList" resultType="list" parameterType="param" resultMap="boardResultMap">
+		select MNO,TITLE,CRE_DATE,STORY,MNAME
+		from BOARDS
+		where MNAME=#{mname}
+		LIMIT #{cpagenum},5
+	</select>
+	
+	<insert id="insert" parameterType="board">
+		insert into BOARDS(MNAME,TITLE,STORY,CRE_DATE)
+		values(#{name},#{title},#{story},now())
+	</insert>
+	
+	<select id="selectOne" parameterType="int" resultMap="boardResultMap">
+		select MNO,TITLE,STORY
+		from BOARDS
+		where MNO=#{value}
+	</select>
+	
+	<update id="update" parameterType="board">
+		update BOARDS set
+			TITLE=#{title}, 
+			STORY=#{story}
+		where MNO=#{no}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from BOARDS
+		where MNO=#{value}
+	</delete>
+	
+	<select id="totalCount" parameterType="string" resultMap="boardResultMap">
+		select MNO,TITLE,CRE_DATE,STORY,MNAME
+		from BOARDS
+		where MNAME=#{value}
+	</select>
+	
+</mapper>

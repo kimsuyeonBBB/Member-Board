@@ -1,5 +1,6 @@
 package spms.listeners;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,6 +13,9 @@ import javax.servlet.annotation.WebListener;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import spms.context.ApplicationContext;
 import spms.controls.BoardAddController;
@@ -48,17 +52,34 @@ public class ContextLoaderListener implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		try {
+			//SqlSessionFactory 객체를 별도로 생성해서 등록해야 하기 때문에 기존의 방식처럼 객체 생성과 의존 객체 주입을 생성자에서 일괄처리 할 수 없다.
+			//따라서 ApplicationContext 객체를 생성할 때 기본 생성자를 호출하도록 코드를 변경하였다.
+			applicationContext = new ApplicationContext();
+			
+			//mybatis 설정파일 'mybatis-config.xml"은 SqlSessionFactory를 생성할 때 사용할 설계도면이다.
+			String resource = "spms/dao/mybatis-config.xml";
+			//입력 스트림을 얻기 위해 mybatis에서 제공하는 Resources 클래스를 사용하였다.
+			InputStream inputStream = Resources.getResourceAsStream(resource);
+			//SqlSessionFactory 객체 생성
+			SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+			
+			//SqlSessionFactory 객체를 생성했으면 ApplicationContext에 등록해야 한다. 그래야 DAO에 주입할 수 있다.
+			applicationContext.addBean("sqlSessionFactory", sqlSessionFactory);
+			
 			ServletContext sc = event.getServletContext();
 			
 			//프로퍼티 파일의 이름과 경로 정보도 web.xml 파일로부터 읽어오게 처리하였다.
 			//ServletContext의 getInitParameter()를 호출해서 web.xml에 설정된 매개변수 정보를 가져온다.
 			String propertiesPath = sc.getRealPath(sc.getInitParameter("contextConfigLocation"));
-			//그리고 ApplicationContext 객체를 생성할 때 생성자의 매개변수로 넘겨준다.
-			applicationContext = new ApplicationContext(propertiesPath);
-			//이렇게 생성한 ApplicationContext 객체는 프런트 컨트롤러에서 사용할 수 있게 ContextLoaderListener의 클래스 변수 'applicationContext'에 저장된다.
 			
-			//더이상 이 클래스를 변경할 필요가 없다.
-			//페이지 컨트롤러나 DAO 등을 추가할 때는 프로퍼티 파일에 그 클래스에 대한 정보를 한줄 추가하면 자동으로 그 객체가 생성된다.
+			//프로퍼티 파일의 내용에 따라 객체를 생성하도록 ApplicationContext에 지시한다.
+			applicationContext.prepareObjectsByProperties(propertiesPath);
+			
+			//애노테이션이 붙은 클래스를 찾아 객체를 생성한다.
+			applicationContext.prepareObjectsByAnnotation("");
+			
+			//마지막으로 ApplicationContext에서 관리하는 객체들을 조사하여 의존 객체를 주입한다.
+			applicationContext.injectDependency();
 			
 		} catch(Throwable e) {
 			e.printStackTrace();

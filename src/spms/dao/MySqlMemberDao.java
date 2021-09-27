@@ -11,6 +11,9 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+
 import spms.annotation.Component;
 import spms.servlets.PageMaker;
 import spms.util.DBConnectionPool;
@@ -18,200 +21,98 @@ import spms.vo.Member;
 
 @Component("memberDao")
 public class MySqlMemberDao implements MemberDao{
-	//외부로부터 Connection 객체를 주입 받기 위한 셋터 메서드와 인스턴스 변수 준비 (의존성 주입/DI)
-	DataSource ds;
+	SqlSessionFactory sqlSessionFactory;
 	
-	public void setDataSource(DataSource ds) {
-		this.ds = ds;
+	public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+		this.sqlSessionFactory = sqlSessionFactory;
 	}
 	
-	public List<Member> selectList(int cpagenum,PageMaker pagemaker) throws Exception{
-		Connection connection = null;
-		ResultSet rs = null;
-		PreparedStatement stmt = null;
-		
-		ArrayList<Member> members = new ArrayList<Member>();
+	public List<Member> selectList(int cpagenum) throws Exception{
+		SqlSession sqlSession = sqlSessionFactory.openSession();
 		
 		try {
-			connection = ds.getConnection();
-			stmt = connection.prepareStatement("SELECT MNO,MNAME,EMAIL,CRE_DATE" +
-									" FROM MEM_AD" +
-									" ORDER BY MNO ASC" + 
-									" LIMIT ?,?");
-			stmt.setInt(1,(cpagenum-1)*5 );
-			stmt.setInt(2, pagemaker.getContentnum());
-			rs = stmt.executeQuery();
+			cpagenum = (cpagenum-1)*5;
 			
-			while(rs.next()) {
-				members.add(new Member()
-						.setNo(rs.getInt("MNO"))
-						.setName(rs.getString("MNAME"))
-						.setEmail(rs.getString("EMAIL"))
-						.setCreatedDate(rs.getDate("CRE_DATE")));
-			}
-
+			return sqlSession.selectList("spms.dao.MemberDao.selectList",cpagenum);
 			
-			return members;
-		}catch(Exception e) {
-			throw e;
-		}finally {
-			try {if(rs != null) rs.close();} catch(Exception e) {}
-			try {if(stmt != null)stmt.close();} catch(Exception e) {}
-			try {if(connection != null) connection.close();} catch(Exception e) {}
+		} finally {
+			sqlSession.close();
 		}
 	}
 	
-	public int totalCount(int cpagenum) throws Exception{
-		Connection connection = null;
-		ResultSet rs = null;
-		PreparedStatement stmt = null;
-	
-		ArrayList<Member> totalCount = new ArrayList<Member>();
-
+	public int totalCount() throws Exception{
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+		
 		try {
-			connection = ds.getConnection();
-			stmt = connection.prepareStatement("SELECT MNO,MNAME,EMAIL,CRE_DATE" +
-					" FROM MEM_AD" +
-					" ORDER BY MNO ASC");
-			rs = stmt.executeQuery();
+			return sqlSession.selectList("spms.dao.MemberDao.totalCount").size();
 
-			while(rs.next()) {
-				totalCount.add(new Member()
-						.setNo(rs.getInt("MNO"))
-						.setName(rs.getString("MNAME"))
-						.setEmail(rs.getString("EMAIL"))
-						.setCreatedDate(rs.getDate("CRE_DATE")));
-			}
-
-			return totalCount.size();
-
-		} catch(Exception e) { 
-			throw e;
-		}finally {
-			try {if(rs != null) rs.close();} catch(Exception e) {}
-			try {if(stmt != null)stmt.close();} catch(Exception e) {}
-			try {if(connection != null) connection.close();} catch(Exception e) {}
+		} finally {
+			sqlSession.close();
 		}
 	}
 	
 	public int insert(Member member) throws Exception{
-		Connection connection = null;
-		PreparedStatement stmt = null;
-		try {
-			connection = ds.getConnection();
-			stmt = connection.prepareStatement("INSERT INTO MEM_AD(MNAME, EMAIL,ID, PWD, CRE_DATE, MOD_DATE)" + 
-												" VALUES (?,?,?,?,NOW(),NOW())");
-			stmt.setString(1, member.getName());
-			stmt.setString(2, member.getEmail());
-			stmt.setString(3, member.getId());
-			stmt.setString(4, member.getPassword());
-			return stmt.executeUpdate();
-		} catch(Exception e) {
-			throw e;
-		} finally {
-			try {if(stmt != null) stmt.close();} catch(Exception e) {}
-			try {if(connection != null) connection.close();} catch(Exception e) {}
-		}
+		SqlSession sqlSession = sqlSessionFactory.openSession();
 		
-	}
-	
-	public int delete(int no) throws Exception{
-		Connection connection = null;
-		Statement stmt = null;
 		try {
-			connection = ds.getConnection();
-			stmt = connection.createStatement();
-			return stmt.executeUpdate("DELETE FROM MEM_AD WHERE MNO=" + no);
-		} catch(Exception e) {
-			throw e;
+			int count = sqlSession.insert("spms.dao.MemberDao.insert",member);
+			sqlSession.commit();
+			return count;
+			
 		} finally {
-			try {if(stmt != null) stmt.close();} catch(Exception e) {}
-			try {if(connection != null) connection.close();} catch(Exception e) {}
+			sqlSession.close();
 		}
 		
 	}
 	
 	public Member selectOne(int no) throws Exception {
-		Connection connection = null;
-		Statement stmt = null;
-		ResultSet rs = null;
+		SqlSession sqlSession = sqlSessionFactory.openSession();
 		
 		try {
-			connection = ds.getConnection();
-			stmt = connection.createStatement();
-			//요청 매개변수로 넘어온 회원 번호를 가지고 회원 정보를 질의한다.
-			rs = stmt.executeQuery("SELECT MNO,MNAME,EMAIL,ID,PWD,CRE_DATE FROM MEM_AD" + " WHERE MNO=" + no);
-			//단 한명의 회원정보를 가져오기 때문에 next()를 한번만 호출한다.
+			return sqlSession.selectOne("spms.dao.MemberDao.selectOne", no);
 			
-			if(rs.next()) {
-				return new Member()
-						.setNo(rs.getInt("MNO"))
-						.setName(rs.getString("MNAME"))
-						.setEmail(rs.getString("EMAIL"))
-						.setId(rs.getString("ID"))
-						.setPassword(rs.getString("PWD"))
-						.setCreatedDate(rs.getDate("CRE_DATE"));
-			} else {
-				throw new Exception("해당 번호의 회원을 찾을 수 없습니다.");
-			}
-			
-		} catch(Exception e) { 
-			throw e;
-		}finally {
-			try {if(rs != null) rs.close();} catch(Exception e) {}
-			try {if(stmt != null)stmt.close();} catch(Exception e) {}
-			try {if(connection != null) connection.close();} catch(Exception e) {}
+		} finally {
+			sqlSession.close();
 		}
 		
 	}
 	
 	public int update(Member member) throws Exception{
-		Connection connection = null;
-		PreparedStatement stmt = null;
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+
 		try {
-			connection = ds.getConnection();
-			stmt = connection.prepareStatement("UPDATE MEM_AD SET MNAME=?,EMAIL=?,ID=?,PWD=?, MOD_DATE=now()" + " WHERE MNO=?");
-			stmt.setString(1, member.getName());
-			stmt.setString(2, member.getEmail());
-			stmt.setString(3, member.getId());
-			stmt.setString(4, member.getPassword());
-			stmt.setInt(5, member.getNo());
+			int count = sqlSession.update("spms.dao.MemberDao.update",member);
+			sqlSession.commit();
+			return count;
 			
-			return stmt.executeUpdate();
-		} catch(Exception e) {
-			throw e;
 		} finally {
-			try {if(stmt != null) stmt.close();} catch(Exception e) {}
-			try {if(connection != null) connection.close();} catch(Exception e) {}
+			sqlSession.close();
 		}
 		
 	}
 	
-	public Member exist(String id, String password) throws Exception{
-		Connection connection = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			connection = ds.getConnection();
-			stmt = connection.prepareStatement("SELECT MNAME,EMAIL FROM MEM_AD" + " WHERE ID=? AND PWD=?");
-			stmt.setString(1, id);
-			stmt.setString(2, password);
-			rs = stmt.executeQuery();
-			if(rs.next()) {
-				//만약 아이디과 암호가 일치하는 회원을 찾는다면 값 객체 Member에 회원 정보를 담는다.
-				return new Member()
-					.setEmail(rs.getString("EMAIL"))
-					.setName(rs.getString("MNAME"));
-			} else {
-				return null;
-			}
+	public int delete(int no) throws Exception{
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+		
+		try {			
+			int count = sqlSession.delete("spms.dao.MemberDao.delete",no);
+			sqlSession.commit();
+			return count;
 			
-		} catch(Exception e) { 
-			throw e;
 		} finally {
-			try {if(rs != null) rs.close();} catch(Exception e) {}
-			try {if(stmt != null)stmt.close();} catch(Exception e) {}
-			try {if(connection != null) connection.close();} catch(Exception e) {}
+			sqlSession.close();
+		}
+		
+	}
+	
+	public Member exist(Member member) throws Exception{
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+
+		try {
+			return sqlSession.selectOne("spms.dao.MemberDao.exist",member);
+			
+		} finally {
+			sqlSession.close();
 		}
 		
 	}

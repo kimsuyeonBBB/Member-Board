@@ -6,69 +6,48 @@ import java.sql.ResultSet;
 
 import javax.sql.DataSource;
 
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+
 import spms.annotation.Component;
 import spms.util.DBConnectionPool;
 import spms.vo.Member;
 
 @Component("findDao")
 public class MySqlFindDao implements FindDao{
-	DataSource ds;
+	SqlSessionFactory sqlSessionFactory;
 	
-	public void setDataSource(DataSource ds) {
-		this.ds = ds;
+	public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+		this.sqlSessionFactory = sqlSessionFactory;
 	}
 	
 	public Member findid(String name, String email) throws Exception{
-		Connection connection = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+		
 		try {
-			connection = ds.getConnection();
-			stmt = connection.prepareStatement("SELECT MNAME,ID FROM MEM_AD" + " WHERE MNAME=? AND EMAIL=?");
-			stmt.setString(1, name);
-			stmt.setString(2, email);			
-			rs = stmt.executeQuery();
-			if(rs.next()) {
-				return new Member()
-						.setName(rs.getString("MNAME"))
-						.setId(rs.getString("ID"));
-			} else {
-				return null;
-			}
-		} catch(Exception e) { 
-			throw e;
-		}finally {
-			try {if(rs != null) rs.close();} catch(Exception e) {}
-			try {if(stmt != null)stmt.close();} catch(Exception e) {}
-			try {if(connection != null) connection.close();} catch(Exception e) {}
+			MyParameter param = new MyParameter();
+			param.setFname(name);
+			param.setEmail(email);
+			
+			return sqlSession.selectOne("spms.dao.FindDao.findid",param);
+			
+		} finally {
+			sqlSession.close();
 		}
 	}
 	
 	public Member findpw(String name, String email, String id) throws Exception{
-		Connection connection = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
+		SqlSession sqlSession = sqlSessionFactory.openSession();
+
 		try {
-			connection = ds.getConnection();
-			stmt = connection.prepareStatement("SELECT MNAME,PWD FROM MEM_AD" + " WHERE MNAME=? AND EMAIL=? AND ID=?");
-			stmt.setString(1, name);
-			stmt.setString(2, email);
-			stmt.setString(3, id);		
-			rs = stmt.executeQuery();
-			if(rs.next()) {
-				return new Member()
-						.setName(rs.getString("MNAME"))
-						.setPassword(rs.getString("PWD"));
-						
-			} else {
-				return null;
-			}
-		} catch(Exception e) { 
-			throw e;
+			MyParameter param = new MyParameter();
+			param.setFname(name);
+			param.setEmail(email);
+			param.setId(id);
+			
+			return sqlSession.selectOne("spms.dao.FindDao.findpw",param);
 		} finally {
-			try {if(rs != null) rs.close();} catch(Exception e) {}
-			try {if(stmt != null)stmt.close();} catch(Exception e) {}
-			try {if(connection != null) connection.close();} catch(Exception e) {}
+			sqlSession.close();
 		}
 	}
 }

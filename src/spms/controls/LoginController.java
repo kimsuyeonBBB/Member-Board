@@ -34,9 +34,7 @@ public class LoginController implements Controller, DataBinding {
 			return "/auth/LogInForm.jsp";
 
 		} else {
-			Member member = memberDao.exist(
-					loginInfo.getId(),
-					loginInfo.getPassword());
+			Member member = memberDao.exist(loginInfo);
 			
 			if(member != null) {
 				HttpSession session = (HttpSession) model.get("session");

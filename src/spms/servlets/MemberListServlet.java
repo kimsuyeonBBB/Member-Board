@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.GenericServlet;
 import javax.servlet.RequestDispatcher;
@@ -43,7 +44,7 @@ public class MemberListServlet extends HttpServlet{
 			//직접 MemberDao 객체를 생성하지 않고 ServletContext에 저장된 Dao 객체를 꺼내 쓰는 것으로 변경하였다.
 			MySqlMemberDao memberDao = (MySqlMemberDao) sc.getAttribute("memberDao");
 			
-			pagemaker.setTotalcount(memberDao.totalCount(cpagenum));
+			pagemaker.setTotalcount(memberDao.totalCount());
 			pagemaker.setPagenum(cpagenum);
 			pagemaker.setCurrentblock(cpagenum);
 			pagemaker.setLastblock(pagemaker.getTotalcount());
@@ -54,7 +55,7 @@ public class MemberListServlet extends HttpServlet{
 
 			
 			//request에 회원 목록 데이터 보관한다.
-			request.setAttribute("members",memberDao.selectList(cpagenum,pagemaker));
+			request.setAttribute("members",memberDao.selectList(cpagenum));
 			request.setAttribute("page", pagemaker);
 			request.setAttribute("viewUrl", "/member/MemberList.jsp");
 

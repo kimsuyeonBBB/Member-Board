@@ -7,8 +7,8 @@ import spms.vo.Board;
 import spms.vo.Member;
 
 public interface BoardDao {
-	List<Board> selectList(int cpagenum, PageMaker pagemaker,Member member) throws Exception;
-	int totalCount(int cpagenum, Member member) throws Exception;
+	List<Board> selectList(int cpagenum,String mname) throws Exception;
+	int totalCount(String name) throws Exception;
 	int insert(Board board) throws Exception;
 	int delete(int no) throws Exception;
 	Board selectOne(int no) throws Exception;

@@ -16,31 +16,25 @@ import spms.annotation.Component;
 //프로퍼티 파일에 설정된 객체를 준비하는 일을 한다.
 //ApplicationContext()를 만든 이유는 페이지 컨트롤러나 DAO가 추가되더라도 ContextLoaderListener를 변경하지 않기 위함이다.
 public class ApplicationContext {
-	//프로퍼티에 설정된 대로 객체를 준비하면 객체를 저장할 보관소가 필요하다.
+	//프로퍼티에 설정된 대로 객체를 준비하면 객체를 저장할 보관소가 필요하다.  (인스턴스 목록 저장)
 	//이를 위해 해시 테이블을 준비한다.
 	Hashtable<String,Object> objTable = new Hashtable<String,Object>();
 	
-	//또한 해시 테이블에서 객체를 꺼낼 메서드도 정의한다.
+	//또한 해시 테이블에서 객체를 꺼낼 메서드도 정의한다.   (인스턴스 찾아주는 메서드)
 	public Object getBean(String key) {
 		return objTable.get(key);
 	}
 	
-	//ApplicationContext 생성자가 호출되면 매개변수로 지정된 프로퍼티 파일의 내용을 로딩해야한다. (이를 위해 java.util.Properties 클래스를 사용)
-	//Properties는 '이름=값' 형태로 된 파일을 다룰 때 사용하는 클래스이다.
-	public ApplicationContext(String propertiesPath) throws Exception{
-		Properties props = new Properties();
-		//load() 메서드는 FileReader를 통해 읽어들인 프로퍼티 내용을 키-값 형태로 내부 맵에 보관한다.
-		props.load(new FileReader(propertiesPath));
-		
-		prepareObjects(props);
-		prepareAnnotaionObjects();
-		injectDependency();
+	//외부에서 생성한 SqlSessionFactory를 등록할 수 있게 addBean() 메서드 추가
+	public void addBean(String name, Object obj) {
+		objTable.put(name, obj);
 	}
 	
 	//애노테이션이 붙은 클래스를 찾아서 객체를 준비하는 메서드
 	//Reflections라는 오픈 소스 라이브러리 사용
-	private void prepareAnnotaionObjects() throws Exception{
-		Reflections reflector = new Reflections("");
+	//애노테이션을 검색할 패키지 이름을 매개변수로 받는다.
+	public void prepareObjectsByAnnotation(String basePackage) throws Exception{
+		Reflections reflector = new Reflections(basePackage);
 		
 		Set<Class<?>> list = reflector.getTypesAnnotatedWith(Component.class);
 		String key = null;
@@ -54,7 +48,11 @@ public class ApplicationContext {
 	}
 	
 	//프로퍼티 파일을 로딩했으면 그에 따라 객체를 준비해야 한다.
-	private void prepareObjects(Properties props) throws Exception{
+	//매개변수는 Properties 객체를 직접 받는 대신, 프로퍼티 파일의 경로를 받아서 내부에서 Properties 객체를 생성하도록 변경하였다.
+	public void prepareObjectsByProperties(String propertiesPath) throws Exception{
+		Properties props = new Properties();
+		props.load(new FileReader(propertiesPath));
+		
 		//먼저 JNDI 객체를 찾을 때 사용할 InitialContext를 준비한다.
 		Context ctx = new InitialContext();
 		String key = null;
@@ -77,7 +75,7 @@ public class ApplicationContext {
 	}
 	
 	//톰캣 서버로부터 객체를 가져오거나(DataSource) 직접 객체를 생성했으면(MemberDao) 이제는 각 객체가 필요로 하는 의존 객체를 할당해주어야 한다.
-	private void injectDependency() throws Exception{
+	public void injectDependency() throws Exception{
 		for(String key : objTable.keySet()) {
 			//나머지 객체에 대해서 셋터 메서드를 호출하였다.
 			if(!key.startsWith("jndi.")) {

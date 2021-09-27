@@ -47,17 +47,17 @@ for(Member member : members){
 <div style="margin-left:70px; width:180px; float:left; text-align:center;"><a href='update.do?no=<%=member.getNo()%>'><%=member.getName()%></a></div>
 <div style="margin-left:20px; width:180px; float:left; text-align:center;"><%=member.getEmail()%></div> 
 <div style="margin-left:40px; width:180px; float:left; text-align:center;"><%=member.getCreatedDate()%></div> 
-<a href="#" onclick="removeCheck()">[삭제]</a><br><br>
+<a href="#" onclick="removeCheck(<%=member.getNo()%>)">[삭제]</a><br><br>
+<%}%>
 <script type="text/javascript">
-function removeCheck(){
+function removeCheck(no){
 	if(confirm("삭제하시겠습니까?") == true){ //'확인' 클릭 시
-		location.href='delete.do?no=<%=member.getNo()%>';
+		location.href='delete.do?no=' + no;
 	} else{  //'취소' 클릭 시
 		return false;
 	}
 }
 </script>
-<%}%>
 
 <table>
     <tfoot>
