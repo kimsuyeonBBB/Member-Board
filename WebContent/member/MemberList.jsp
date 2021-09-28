@@ -33,7 +33,55 @@
 
 <hr style="width:1800px; border:3px solid black;"></hr>
 <div style='font-size:20px; width:1800px; margin-left:10px;'>
-<b>&emsp;번호  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 이름 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 이메일 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 생성일  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</b>
+<b>&emsp;
+	<c:choose>
+	<c:when test="${orderCond == 'MNO_ASC'}">
+		<a href="list.do?orderCond=MNO_DESC">번호 ↑</a>
+	</c:when>
+	<c:when test="${orderCond == 'MNO_DESC'}">
+		<a href="list.do?orderCond=MNO_ASC">번호↓</a>
+	</c:when>
+	<c:otherwise>
+		<a href="list.do?orderCond=MNO_ASC">번호</a>
+	</c:otherwise>
+	</c:choose></b>  
+<b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 
+	<c:choose>
+	<c:when test="${orderCond == 'MNAME_ASC'}">
+		<a href="list.do?orderCond=MNAME_DESC">이름↑</a>
+	</c:when>
+	<c:when test="${orderCond == 'MNAME_DESC'}">
+		<a href="list.do?orderCond=MNAME_ASC">이름↓</a>
+	</c:when>
+	<c:otherwise>
+		<a href="list.do?orderCond=MNAME_ASC">이름</a>
+	</c:otherwise>
+	</c:choose> </b> 
+<b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 
+	<c:choose>
+	<c:when test="${orderCond == 'EMAIL_ASC'}">
+		<a href="list.do?orderCond=EMAIL_DESC">이메일↑</a>
+	</c:when>
+	<c:when test="${orderCond == 'EMAIL_DESC'}">
+		<a href="list.do?orderCond=EMAIL_ASC">이메일↓</a>
+	</c:when>
+	<c:otherwise>
+		<a href="list.do?orderCond=EMAIL_ASC">이메일</a>
+	</c:otherwise>
+	</c:choose></b>  
+<b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 
+	<c:choose>
+	<c:when test="${orderCond == 'CREATEDATE_ASC'}">
+		<a href="list.do?orderCond=CREATEDATE_DESC">생성일↑</a>
+	</c:when>
+	<c:when test="${orderCond == 'CREATEDATE_DESC'}">
+		<a href="list.do?orderCond=CREATEDATE_ASC">생성일↓</a>
+	</c:when>
+	<c:otherwise>
+		<a href="list.do?orderCond=CREATEDATE_ASC">생성일</a>
+	</c:otherwise>
+	</c:choose></b> 
+<b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</b>
 </div>
 <hr style="width:1800px; border:2px solid black;"></hr>
 

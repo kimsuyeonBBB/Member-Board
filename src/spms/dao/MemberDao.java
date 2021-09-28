@@ -1,12 +1,13 @@
 package spms.dao;
 
+import java.util.HashMap;
 import java.util.List;
 
 import spms.servlets.PageMaker;
 import spms.vo.Member;
 
 public interface MemberDao {
-	List<Member> selectList(int cpagenum) throws Exception;
+	List<Member> selectList(HashMap<String, Object> paramMap) throws Exception;
 	int totalCount() throws Exception;
 	int insert(Member member) throws Exception;
 	int delete(int no) throws Exception;

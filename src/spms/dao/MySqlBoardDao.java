@@ -1,5 +1,7 @@
 package spms.dao;
 
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -16,17 +18,15 @@ public class MySqlBoardDao implements BoardDao{
 		this.sqlSessionFactory = sqlSessionFactory;
 	}
 	
-	public List<Board> selectList(int cpagenum,String mname) throws Exception{
+	public List<Board> selectList(HashMap<String,Object> paramMap) throws Exception{
 		SqlSession sqlSession = sqlSessionFactory.openSession();
 		
 		try {
-			MyParameter param = new MyParameter();
+			int cpagenum = (int) paramMap.get("cpagenum");
 			cpagenum = (cpagenum-1)*5;
-			param.setCpagenum(cpagenum);
-			param.setMname(mname);
+			paramMap.put("cpagenum", cpagenum);
 			
-			List<Board> result = sqlSession.selectList("spms.dao.BoardDao.selectList", param);
-			return result;
+			return sqlSession.selectList("spms.dao.BoardDao.selectList", paramMap);
 			
 		} finally {
 			sqlSession.close();
@@ -72,10 +72,28 @@ public class MySqlBoardDao implements BoardDao{
 		SqlSession sqlSession = sqlSessionFactory.openSession();
 		
 		try {
-			int count = sqlSession.update("spms.dao.BoardDao.update",board);
-			sqlSession.commit();
-			return count;
+			Board original = sqlSession.selectOne("spms.dao.BoardDao.selectOne", board.getNo());
 			
+			Hashtable<String,Object> paramMap = new Hashtable<String,Object>();
+			
+			if(!board.getTitle().equals(original.getTitle())) {
+				paramMap.put("title", board.getTitle());
+			}
+			
+			if(!board.getStory().equals(original.getStory())) {
+				paramMap.put("story", board.getStory());
+			}
+			
+			if(paramMap.size()>0) {
+				paramMap.put("no", board.getNo());
+				
+				int count = sqlSession.update("spms.dao.BoardDao.update",paramMap);
+				sqlSession.commit();
+				return count;
+			} else {
+				return 0;
+			}
+
 		} finally {
 			sqlSession.close();
 		}

@@ -35,7 +35,43 @@
 
 <hr style="width:1800px; border:3px solid black;"></hr>
 <div style='font-size:20px; width:1800px; margin-left:10px;'>
-<b>&emsp;번호  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 제목 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 등록일 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  작성자</b>
+<b>&emsp;
+	<c:choose>
+	<c:when test="${orderCond == 'MNO_ASC'}">
+		<a href="list.do?orderCond=MNO_DESC">번호 ↑</a>
+	</c:when>
+	<c:when test="${orderCond == 'MNO_DESC'}">
+		<a href="list.do?orderCond=MNO_ASC">번호↓</a>
+	</c:when>
+	<c:otherwise>
+		<a href="list.do?orderCond=MNO_ASC">번호</a>
+	</c:otherwise>
+	</c:choose></b>  
+<b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 
+	<c:choose>
+	<c:when test="${orderCond == 'TITLE_ASC'}">
+		<a href="list.do?orderCond=TITLEE_DESC">제목↑</a>
+	</c:when>
+	<c:when test="${orderCond == 'TITLEE_DESC'}">
+		<a href="list.do?orderCond=TITLE_ASC">제목↓</a>
+	</c:when>
+	<c:otherwise>
+		<a href="list.do?orderCond=TITLE_ASC">제목</a>
+	</c:otherwise>
+	</c:choose></b> 
+<b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; 
+	<c:choose>
+	<c:when test="${orderCond == 'CREATEDATE_ASC'}">
+		<a href="list.do?orderCond=CREATEDATE_DESC">등록일↑</a>
+	</c:when>
+	<c:when test="${orderCond == 'CREATEDATE_DESC'}">
+		<a href="list.do?orderCond=CREATEDATE_ASC">등록일↓</a>
+	</c:when>
+	<c:otherwise>
+		<a href="list.do?orderCond=CREATEDATE_ASC">등록일</a>
+	</c:otherwise>
+	</c:choose></b> 
+<b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;  작성자</b>
 </div>
 <hr style="width:1800px; border:2px solid black;"></hr>
 
