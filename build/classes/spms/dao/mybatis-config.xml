@@ -4,6 +4,11 @@
 	"http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>	
+
+	<settings>
+		<setting name="logImpl" value="LOG4J"/>
+	</settings>
+
 	<typeAliases>
 		<typeAlias type="spms.vo.Member" alias="member"/>
 		<typeAlias type="spms.vo.Board" alias="board"/>
